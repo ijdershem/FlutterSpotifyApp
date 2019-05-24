@@ -11,7 +11,7 @@ import 'dart:convert' as JSON;
 void main() => runApp(MyApp());
 
 var client_id = '80a3298daea74e078d240a508afcc4c1';
-var client_secret = '3d647f09c440414d89a15ef97f23f36d';
+var client_secret;
 var redirect_uri;
 
 class MyApp extends StatelessWidget {

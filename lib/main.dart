@@ -9,13 +9,15 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart';
 import 'dart:convert' as JSON;
 import 'dart:convert';
+import 'package:flutter/rendering.dart';
 
 void main() {
+  debugPaintSizeEnabled = false;
   runApp(MyApp());
 }
 
-var client_id;
-var client_secret;
+var client_id = '80a3298daea74e078d240a508afcc4c1';
+var client_secret = '';
 var redirect_uri = "http://localhost:3000/callback";
 var localhost;
 
@@ -24,13 +26,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Node server demo',
+      title: 'Spin - A Crowd Sourced Aux Cord',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: Scaffold(
-        appBar: AppBar(title: Text('Spotify Authentication')),
         body: BodyWidget(),
       ),
     );
@@ -44,30 +45,44 @@ class BodyWidget extends StatefulWidget {
   }
 }
 
+
+// Body widget button for sending user authentication request to
+// Spotify API
 class BodyWidgetState extends State<BodyWidget> {
-  String serverResponse = 'Server response';
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(32.0),
       child: Align(
-        alignment: Alignment.topCenter,
+        alignment: Alignment.center,
         child: SizedBox(
-          width: 200,
+          width: 300,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(top: 150.0, bottom: 50.0),
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    text: 'Choose a Music Service',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                      color: Colors.black.withOpacity(0.8),
+                      fontFamily: 'Raleway',
+                    ),
+                  ),
+                ),
+              ),
               RaisedButton(
                 child: Text('Log into Spotify'),
                 onPressed: () async { 
-                  final Token user_token = await _getToken();
+                  final Token user_token = await _getToken(); //Returns Token object containing access and refresh tokens
                   print(user_token.access_token);
                 },
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(serverResponse),
               ),
             ],
           ),
@@ -76,6 +91,8 @@ class BodyWidgetState extends State<BodyWidget> {
     );
   }
 
+  // Send a POST request to the /token endpoint
+  // of the Spotify Web API once the user has granted access
   Future<Token> _getToken() async {
     Stream<String> onCode = await _server();
     _auth();
@@ -94,11 +111,10 @@ class BodyWidgetState extends State<BodyWidget> {
         'redirect_uri' : redirect_uri
       }
     );
-    // print('Response status: ${token_response.statusCode}');
-    // print('Response body: ${token_response.body}');
     return new Token.fromMap(JSON.jsonDecode(token_response.body));
   } 
-
+  
+  //  Launch a local host for use with the Spotify Web API
   Future<Stream<String>> _server() async {
     final StreamController<String> onCode = new StreamController();
     HttpServer server =
@@ -119,6 +135,8 @@ class BodyWidgetState extends State<BodyWidget> {
   }
 }
 
+// Performs a GET request to the /authorize endpoint
+// of the Spotify Web API 
 void _auth() async { 
   var state = randomAlphaNumeric(16);
   var scope = 'user-read-private user-read-email';
@@ -145,6 +163,8 @@ void _auth() async {
   }
 }
 
+// A class to represent the response from an access token request
+// to the Spotify Web API
 class Token {
   final String access_token;
   final String token_type;

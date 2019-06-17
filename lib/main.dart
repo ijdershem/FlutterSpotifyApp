@@ -10,16 +10,17 @@ import 'package:http/http.dart';
 import 'dart:convert' as JSON;
 import 'dart:convert';
 import 'package:flutter/rendering.dart';
+import 'landing.dart' as landing;
+import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 
 void main() {
   debugPaintSizeEnabled = false;
   runApp(MyApp());
 }
 
-var client_id = '80a3298daea74e078d240a508afcc4c1';
-var client_secret = '';
 var redirect_uri = "http://localhost:3000/callback";
 var localhost;
+var url;
 
 
 class MyApp extends StatelessWidget {
@@ -38,13 +39,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
+
 class BodyWidget extends StatefulWidget {
   @override
   BodyWidgetState createState() {
     return new BodyWidgetState();
   }
 }
-
 
 // Body widget button for sending user authentication request to
 // Spotify API
@@ -79,9 +81,13 @@ class BodyWidgetState extends State<BodyWidget> {
               ),
               RaisedButton(
                 child: Text('Log into Spotify'),
-                onPressed: () async { 
+                onPressed: () async {
                   final Token user_token = await _getToken(); //Returns Token object containing access and refresh tokens
                   print(user_token.access_token);
+                  Navigator.push( 
+                    context,
+                    MaterialPageRoute(builder: (context) => landing.Home(user_token)),
+                  );
                 },
               ),
             ],
@@ -111,6 +117,7 @@ class BodyWidgetState extends State<BodyWidget> {
         'redirect_uri' : redirect_uri
       }
     );
+    print(JSON.jsonDecode(token_response.body));
     return new Token.fromMap(JSON.jsonDecode(token_response.body));
   } 
   
@@ -154,7 +161,7 @@ void _auth() async {
     path: 'authorize',
     queryParameters: authQueryParameters);
 
-  String url = authQuery.toString();
+  url = authQuery.toString();
   if (await canLaunch(url)) {
     print(url); 
     await launch(url);
@@ -180,4 +187,29 @@ class Token {
           expires_in = json['expires_in'],
           refresh_token = json['refresh_token'];
 }
+
+//WebView Widget Attempt 6/3/2019
+// class AuthWebView extends StatefulWidget { 
+//   @override
+//   AuthWebViewState createState() {
+//     return new AuthWebViewState();
+//   }
+// }
+
+// class AuthWebViewState extends State<AuthWebView> { 
+
+//   @override
+//   Widget build(BuildContext context) { 
+//     return MaterialApp( 
+//       routes: { 
+//         "/": (_) => new WebviewScaffold( 
+//           url: url,
+//           appBar: new AppBar( 
+//             title: new Text("Authorize Music Service"),
+//           ),
+//         ),
+//       },
+//     );
+//   }
+// }
 

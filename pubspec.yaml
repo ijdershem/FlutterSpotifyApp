@@ -21,9 +21,14 @@ dependencies:
   js: ^0.6.0
   random_string: ^0.0.2
   spotify: ^0.1.6+3
-  url_launcher: ^5.0.2
+  url_launcher:
+    git:
+      url: git://github.com/flutter/plugins
+      path: packages/url_launcher
   flutter:
     sdk: flutter
+  webview_flutter: ^0.3.0
+  flutter_webview_plugin: ^0.3.5
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
